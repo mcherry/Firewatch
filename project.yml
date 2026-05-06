@@ -1,6 +1,6 @@
 name: Firewatch
 options:
-  bundleIdPrefix: com.mcherry
+  bundleIdPrefix: com.firewatch
   deploymentTarget:
     macOS: "14.0"
   groupSortPosition: top
@@ -18,7 +18,7 @@ targets:
       - Firewatch
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.mcherry.Firewatch
+        PRODUCT_BUNDLE_IDENTIFIER: com.firewatch.Firewatch
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
         CODE_SIGN_ENTITLEMENTS: Firewatch/Resources/Firewatch.entitlements
