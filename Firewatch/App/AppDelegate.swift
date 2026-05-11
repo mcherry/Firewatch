@@ -22,6 +22,7 @@ final class StatusPanel: NSPanel {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     let statusManager = StatusManager()
+    let updateChecker = UpdateChecker()
     private var statusItem: NSStatusItem!
     private var panel: StatusPanel!
     private var settingsWindow: NSWindow?
@@ -34,7 +35,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     func applicationDidFinishLaunching(_ notification: Notification) {
         UserDefaults.standard.register(defaults: [
             "refreshInterval": 120.0,
-            "notificationsEnabled": false
+            "notificationsEnabled": false,
+            "autoCheckForUpdates": true
         ])
 
         statusManager.notificationManager.setup()
@@ -53,6 +55,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
         Task {
             await statusManager.refreshAll(force: true)
+            updateChecker.checkIfNeeded()
         }
     }
 
@@ -262,6 +265,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
 
         let settingsView = SettingsView()
             .environmentObject(statusManager)
+            .environmentObject(updateChecker)
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 420, height: 340),

@@ -16,6 +16,7 @@
 		32ECC59D085153C789A608B3 /* ServiceRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 962A6B7D8541EB8C4130A061 /* ServiceRowView.swift */; };
 		4A7F7F53C58432EB47964105 /* ScriptRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6C80CEA42A4BB6E2AFEFE1 /* ScriptRunner.swift */; };
 		57F53D04B7374F170C1CC600 /* StatusManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D5531912E63A1F757946CB /* StatusManager.swift */; };
+		6818995DE53C8AD6637D8F25 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C96B7963FF9BDD1EFD4C12F /* UpdateChecker.swift */; };
 		7395527EDAD8780021EC58FE /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B887E6AC9FD1BB538A2F00B /* SettingsView.swift */; };
 		9B60E276C5087A38E6409ACE /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 265B1DEB4501BDAF1C970F76 /* KeyboardShortcuts */; };
 		D3DD828C3B31D9A098605EA7 /* FirewatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0F20055803BD586358D62E /* FirewatchApp.swift */; };
@@ -33,6 +34,7 @@
 		2D0F20055803BD586358D62E /* FirewatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirewatchApp.swift; sourceTree = "<group>"; };
 		3532A3A8F78876EBE3F3098D /* ServiceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceDetailView.swift; sourceTree = "<group>"; };
 		48F5C82AD5DA1CAB857A4C22 /* Firewatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Firewatch.entitlements; sourceTree = "<group>"; };
+		4C96B7963FF9BDD1EFD4C12F /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		6F4EBB57E0BD422F0C1C6212 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		76D5531912E63A1F757946CB /* StatusManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusManager.swift; sourceTree = "<group>"; };
 		8107DF589FAF86D8B071BA03 /* Firewatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Firewatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -121,6 +123,7 @@
 				9CB4E69C69F473F94CE42190 /* ScriptStatusProvider.swift */,
 				76D5531912E63A1F757946CB /* StatusManager.swift */,
 				04B619B417F42A7B9E5B5AD1 /* StatusProvider.swift */,
+				4C96B7963FF9BDD1EFD4C12F /* UpdateChecker.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 				57F53D04B7374F170C1CC600 /* StatusManager.swift in Sources */,
 				09826C2E849987D49062912B /* StatusModels.swift in Sources */,
 				1F8A0205EAFA41D82E4214F3 /* StatusProvider.swift in Sources */,
+				6818995DE53C8AD6637D8F25 /* UpdateChecker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -238,8 +242,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mcherry.Firewatch;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.firewatch.Firewatch;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -258,8 +262,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mcherry.Firewatch;
+				MARKETING_VERSION = 1.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.firewatch.Firewatch;
 				SDKROOT = macosx;
 			};
 			name = Release;

@@ -5,6 +5,8 @@ import UserNotifications
 struct SettingsView: View {
     @EnvironmentObject var statusManager: StatusManager
 
+    @EnvironmentObject var updateChecker: UpdateChecker
+
     var body: some View {
         TabView {
             GeneralSettingsView(statusManager: statusManager)
@@ -14,6 +16,10 @@ struct SettingsView: View {
             ScriptsSettingsView(statusManager: statusManager)
                 .tabItem {
                     Label("Scripts", systemImage: "scroll")
+                }
+            AboutSettingsView(updateChecker: updateChecker)
+                .tabItem {
+                    Label("About", systemImage: "info.circle")
                 }
         }
         .frame(width: 420, height: 340)
@@ -158,5 +164,86 @@ struct GeneralSettingsView: View {
         if notificationAuthStatus == .denied && notificationsEnabled {
             // Keep toggle on but show the warning
         }
+    }
+}
+
+// MARK: - About Tab
+
+struct AboutSettingsView: View {
+    @ObservedObject var updateChecker: UpdateChecker
+    @AppStorage("autoCheckForUpdates") private var autoCheckForUpdates = true
+
+    var body: some View {
+        Form {
+            Section {
+                HStack(spacing: 12) {
+                    if let icon = NSImage(named: NSImage.applicationIconName) {
+                        Image(nsImage: icon)
+                            .resizable()
+                            .frame(width: 48, height: 48)
+                    }
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Firewatch")
+                            .font(.headline)
+                        Text("Version \(updateChecker.currentVersion)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+
+            Section {
+                Toggle("Automatically check for updates", isOn: $autoCheckForUpdates)
+                    .toggleStyle(.checkbox)
+
+                HStack {
+                    Button("Check for Updates") {
+                        Task { await updateChecker.checkForUpdates() }
+                    }
+                    .disabled(updateChecker.isChecking)
+
+                    if updateChecker.isChecking {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                }
+            }
+
+            Section {
+                if let error = updateChecker.checkError {
+                    Label(error, systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                        .font(.caption)
+                } else if updateChecker.updateAvailable, let latest = updateChecker.latestVersion {
+                    HStack {
+                        Label(
+                            "Firewatch v\(latest) is available",
+                            systemImage: "arrow.up.circle.fill"
+                        )
+                        .foregroundStyle(.blue)
+                        .font(.callout)
+
+                        Spacer()
+
+                        Button("View on GitHub") {
+                            updateChecker.openReleasePage()
+                        }
+                    }
+                } else if updateChecker.latestVersion != nil {
+                    Label("You're up to date", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.callout)
+                }
+
+                if let lastCheck = updateChecker.lastCheckDate {
+                    Text("Last checked: \(lastCheck.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .padding()
     }
 }

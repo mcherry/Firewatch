@@ -1,4 +1,4 @@
-import Foundation
+import AppKit
 import Combine
 
 @MainActor
@@ -12,6 +12,9 @@ final class StatusManager: ObservableObject {
     let notificationManager = NotificationManager()
     private var previousHealthStates: [String: ServiceHealth] = [:]
     private var lastFetchTime: Date = .distantPast
+    private var isSleeping = false
+    private var sleepObserver: NSObjectProtocol?
+    private var wakeObserver: NSObjectProtocol?
 
     var overallHealth: ServiceHealth {
         guard !services.isEmpty else { return .unknown }
@@ -33,6 +36,38 @@ final class StatusManager: ObservableObject {
         CheckScriptManager.ensureDefaultScripts()
         loadProviders()
         startTimer()
+        observeSleepWake()
+    }
+
+    deinit {
+        if let sleepObserver { NSWorkspace.shared.notificationCenter.removeObserver(sleepObserver) }
+        if let wakeObserver { NSWorkspace.shared.notificationCenter.removeObserver(wakeObserver) }
+    }
+
+    private func observeSleepWake() {
+        let center = NSWorkspace.shared.notificationCenter
+
+        sleepObserver = center.addObserver(
+            forName: NSWorkspace.willSleepNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.isSleeping = true
+                self.timer?.invalidate()
+                self.timer = nil
+            }
+        }
+
+        wakeObserver = center.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.isSleeping = false
+                self.startTimer()
+                await self.refreshAll(force: true)
+            }
+        }
     }
 
     /// Scans the checks directory and loads all .js scripts as providers.
@@ -55,6 +90,8 @@ final class StatusManager: ObservableObject {
 
     /// Fetches status from all providers. Enforces minimum interval between fetches.
     func refreshAll(force: Bool = false) async {
+        guard !isSleeping else { return }
+
         let now = Date()
         let elapsed = now.timeIntervalSince(lastFetchTime)
 
