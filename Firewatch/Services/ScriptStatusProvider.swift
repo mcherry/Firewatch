@@ -78,10 +78,22 @@ struct ScriptStatusProvider: StatusProvider {
             )
         }
 
+        // If the overall status is operational but there are active incidents,
+        // elevate to at least degraded (use the worst incident impact if higher)
+        var effectiveHealth = health
+        let activeIncidents = incidents.filter { $0.isActive }
+        if effectiveHealth == .operational && !activeIncidents.isEmpty {
+            let worstIncidentSeverity = activeIncidents
+                .map { $0.impact.severity }
+                .max() ?? 0
+            let minimumSeverity = max(worstIncidentSeverity, ServiceHealth.degradedPerformance.severity)
+            effectiveHealth = ServiceHealth.allCases.first { $0.severity == minimumSeverity } ?? .degradedPerformance
+        }
+
         return ServiceInfo(
             id: serviceName.lowercased().replacingOccurrences(of: " ", with: "-"),
             name: serviceName,
-            health: health,
+            health: effectiveHealth,
             components: components,
             incidents: incidents,
             lastUpdated: Date(),

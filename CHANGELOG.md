@@ -2,6 +2,12 @@
 
 All notable changes to Firewatch are documented here.
 
+## [1.3.1] — 2026-05-12
+
+### Fixed
+- Services with active incidents but no degraded components now correctly show as degraded instead of operational
+- Uptime History "Range" label no longer wraps to a second line
+
 ## [1.3.0] — 2026-05-12
 
 ### Added
