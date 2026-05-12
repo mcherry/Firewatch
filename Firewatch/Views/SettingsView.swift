@@ -86,6 +86,7 @@ struct ScriptsSettingsView: View {
 struct GeneralSettingsView: View {
     @ObservedObject var statusManager: StatusManager
     @AppStorage("refreshInterval") private var refreshInterval: Double = 120
+    @AppStorage("uptimeLoggingEnabled") private var uptimeLoggingEnabled = false
     @State private var notificationsEnabled = UserDefaults.standard.bool(forKey: "notificationsEnabled")
     @State private var notificationAuthStatus: UNAuthorizationStatus = .notDetermined
 
@@ -140,6 +141,15 @@ struct GeneralSettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+            }
+
+            Section {
+                Toggle("Enable Uptime Logging", isOn: $uptimeLoggingEnabled)
+                    .toggleStyle(.checkbox)
+
+                Text("Record service health at each check interval for historical uptime graphs.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)

@@ -158,6 +158,15 @@ struct StatusDashboardView: View {
             .buttonStyle(.plain)
             .help("Settings")
 
+            Button {
+                NotificationCenter.default.post(name: .openUptimeHistory, object: nil)
+            } label: {
+                Image(systemName: "chart.bar.xaxis")
+                    .font(.body)
+            }
+            .buttonStyle(.plain)
+            .help("Uptime History")
+
             Spacer()
 
             Button("Quit") {

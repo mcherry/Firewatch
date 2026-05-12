@@ -24,6 +24,9 @@ DerivedData/
 .swiftpm/
 Package.resolved
 
+# Developer notes
+DEVELOPMENT.md
+
 # Miscellaneous
 *.pbxuser
 !default.pbxuser

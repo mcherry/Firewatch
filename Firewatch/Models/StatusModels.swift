@@ -3,6 +3,8 @@ import AppKit
 
 extension Notification.Name {
     static let openSettings = Notification.Name("openSettings")
+    static let openUptimeHistory = Notification.Name("openUptimeHistory")
+    static let uptimeDataUpdated = Notification.Name("uptimeDataUpdated")
     static let panelDidClose = Notification.Name("panelDidClose")
 }
 
@@ -131,5 +133,25 @@ extension String {
 
     var nilIfEmpty: String? {
         isEmpty ? nil : self
+    }
+}
+
+// MARK: - Uptime Log Entry
+
+struct StatusLogEntry: Identifiable {
+    let id: Int64
+    let timestamp: Date
+    let serviceId: String
+    let serviceName: String
+    let health: Int  // ServiceHealth.severity value
+    
+    var serviceHealth: ServiceHealth {
+        switch health {
+        case 0: return .operational
+        case 1: return .degradedPerformance
+        case 2: return .partialOutage
+        case 3: return .majorOutage
+        default: return .unknown
+        }
     }
 }

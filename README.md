@@ -14,6 +14,7 @@ A macOS menu bar app that monitors the health of key infrastructure services at 
 - **Global keyboard shortcut** — configurable hotkey to toggle the dashboard (default: ⇧⌥S)
 - **Background polling** — refreshes service status on a configurable interval (default: 2 minutes)
 - **macOS notifications** — opt-in alerts when a service degrades, integrated with the native notification system
+- **Uptime history** — opt-in logging of service health at each poll interval, with a graphical timeline showing historical uptime per service
 - **Custom status checks** — write JavaScript scripts to monitor any service, using a built-in API
 - **Dark mode support** — adapts to system appearance
 
@@ -21,6 +22,10 @@ A macOS menu bar app that monitors the health of key infrastructure services at 
   <img src="Screenshots/002.png" width="420" alt="Service Detail — Components">
   &nbsp;&nbsp;
   <img src="Screenshots/005.png" width="350" alt="Status Change Notification">
+</p>
+
+<p align="center">
+  <img src="Screenshots/006.png" width="600" alt="Uptime History">
 </p>
 
 ## Default Services
@@ -74,6 +79,7 @@ Access settings via the gear icon in the dashboard panel.
 - **Refresh Interval** — 30 seconds to 10 minutes
 - **Keyboard Shortcut** — customizable global hotkey
 - **Notifications** — enable/disable macOS notification alerts for status changes
+- **Uptime Logging** — enable/disable recording of service health for historical graphs
 - **Scripts** — view loaded check scripts, open the scripts folder, or reload after edits
 
 <p align="center">
@@ -108,6 +114,7 @@ Scripts are sorted alphabetically by filename. Use numeric prefixes to control o
 |----------|-------------|
 | `fetch(url)` | HTTP GET → parsed JSON object |
 | `fetch(url, {encoding: "utf-16"})` | HTTP GET with custom response encoding |
+| `fetchResponse(url)` | HTTP GET → `{ status: <http_code>, body: <json_or_null> }` |
 | `fetchText(url)` | HTTP GET → raw response string |
 | `fetchAll([url1, url2, ...])` | Concurrent HTTP GET → array of parsed JSON |
 | `output(obj)` | Set the script's result (required, call exactly once) |
@@ -166,6 +173,27 @@ try {
     output({ status: "operational" });
 } catch (e) {
     output({ status: "major_outage" });
+}
+```
+
+### Example: HTTP Status Code Check
+
+Use `fetchResponse()` to branch on HTTP status codes:
+
+```javascript
+// FIREWATCH_NAME = "My API"
+// FIREWATCH_URL = "https://api.example.com"
+
+var res = fetchResponse("https://api.example.com/health");
+
+if (res.status === 503) {
+    output({ status: "major_outage" });
+} else if (res.status === 429 || res.status >= 500) {
+    output({ status: "degraded" });
+} else if (res.status === 200) {
+    output({ status: "operational" });
+} else {
+    output({ status: "unknown" });
 }
 ```
 

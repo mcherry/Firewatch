@@ -26,6 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private var statusItem: NSStatusItem!
     private var panel: StatusPanel!
     private var settingsWindow: NSWindow?
+    private var uptimeWindow: NSWindow?
     private var hostingController: NSHostingController<AnyView>!
     private var cancellables = Set<AnyCancellable>()
     private var globalClickMonitor: Any?
@@ -36,7 +37,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         UserDefaults.standard.register(defaults: [
             "refreshInterval": 120.0,
             "notificationsEnabled": false,
-            "autoCheckForUpdates": true
+            "autoCheckForUpdates": true,
+            "uptimeLoggingEnabled": false
         ])
 
         statusManager.notificationManager.setup()
@@ -53,6 +55,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             object: nil
         )
 
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOpenUptimeHistory),
+            name: .openUptimeHistory,
+            object: nil
+        )
+
         Task {
             await statusManager.refreshAll(force: true)
             updateChecker.checkIfNeeded()
@@ -62,6 +71,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     @objc private func handleOpenSettings() {
         hidePanel()
         openSettings()
+    }
+
+    @objc private func handleOpenUptimeHistory() {
+        hidePanel()
+        openUptimeHistory()
     }
 
     // MARK: - Status Item
@@ -288,5 +302,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         }
 
         settingsWindow = window
+    }
+
+    // MARK: - Uptime History Window
+
+    func openUptimeHistory() {
+        if let uptimeWindow, uptimeWindow.isVisible {
+            uptimeWindow.makeKeyAndOrderFront(nil)
+            uptimeWindow.orderFrontRegardless()
+            NSApp.activate()
+            return
+        }
+
+        let historyView = UptimeHistoryView(uptimeStore: statusManager.uptimeStore)
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 800, height: 500),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Uptime History"
+        window.contentViewController = NSHostingController(rootView: historyView)
+        window.minSize = NSSize(width: 600, height: 400)
+        window.setFrameAutosaveName("UptimeHistory")
+        window.center()
+        window.isReleasedWhenClosed = false
+        window.level = .floating
+        window.makeKeyAndOrderFront(nil)
+        window.orderFrontRegardless()
+        NSApp.activate()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            window.level = .normal
+        }
+
+        uptimeWindow = window
     }
 }

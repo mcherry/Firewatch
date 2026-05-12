@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01B23815F9E53ECD0C007B56 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C2E2CB3F549EAD952F99033 /* NotificationManager.swift */; };
+		087B7AFF6BB5B82BEBBCCED8 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C40F86A12934463AC54D582 /* libsqlite3.tbd */; };
 		09826C2E849987D49062912B /* StatusModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1A4427C8BF3B1505A699DE /* StatusModels.swift */; };
 		0A071C2A73E9E84EF2A523B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F4EBB57E0BD422F0C1C6212 /* Assets.xcassets */; };
 		1F8A0205EAFA41D82E4214F3 /* StatusProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B619B417F42A7B9E5B5AD1 /* StatusProvider.swift */; };
@@ -19,13 +20,16 @@
 		6818995DE53C8AD6637D8F25 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C96B7963FF9BDD1EFD4C12F /* UpdateChecker.swift */; };
 		7395527EDAD8780021EC58FE /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B887E6AC9FD1BB538A2F00B /* SettingsView.swift */; };
 		9B60E276C5087A38E6409ACE /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 265B1DEB4501BDAF1C970F76 /* KeyboardShortcuts */; };
+		B31B8014531913A3446D5F5F /* UptimeHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01512CCC2B6FBC7699EFDD55 /* UptimeHistoryView.swift */; };
 		D3DD828C3B31D9A098605EA7 /* FirewatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0F20055803BD586358D62E /* FirewatchApp.swift */; };
 		DBA9B57E3E15FFF9CCA9EF85 /* ScriptStatusProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB4E69C69F473F94CE42190 /* ScriptStatusProvider.swift */; };
+		DFE0FD5A90DFF6B307B2FCEF /* UptimeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F49BF7421645136AF923BFC9 /* UptimeStore.swift */; };
 		E01376E7D05187DAE9D3047D /* ServiceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3532A3A8F78876EBE3F3098D /* ServiceDetailView.swift */; };
 		E0A3DA8F53E38244007F60CC /* CheckScriptManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F95BA13ED642FD7A33716A0 /* CheckScriptManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		01512CCC2B6FBC7699EFDD55 /* UptimeHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UptimeHistoryView.swift; sourceTree = "<group>"; };
 		04B619B417F42A7B9E5B5AD1 /* StatusProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusProvider.swift; sourceTree = "<group>"; };
 		17D8D5980A5EC2E160C4FEF7 /* StatusDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusDashboardView.swift; sourceTree = "<group>"; };
 		1B887E6AC9FD1BB538A2F00B /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -35,6 +39,7 @@
 		3532A3A8F78876EBE3F3098D /* ServiceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceDetailView.swift; sourceTree = "<group>"; };
 		48F5C82AD5DA1CAB857A4C22 /* Firewatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Firewatch.entitlements; sourceTree = "<group>"; };
 		4C96B7963FF9BDD1EFD4C12F /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		6C40F86A12934463AC54D582 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		6F4EBB57E0BD422F0C1C6212 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		76D5531912E63A1F757946CB /* StatusManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusManager.swift; sourceTree = "<group>"; };
 		8107DF589FAF86D8B071BA03 /* Firewatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Firewatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -43,6 +48,7 @@
 		9CB4E69C69F473F94CE42190 /* ScriptStatusProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptStatusProvider.swift; sourceTree = "<group>"; };
 		AD1A4427C8BF3B1505A699DE /* StatusModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusModels.swift; sourceTree = "<group>"; };
 		C2A77757472D846FEED5850B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		F49BF7421645136AF923BFC9 /* UptimeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UptimeStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +57,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B60E276C5087A38E6409ACE /* KeyboardShortcuts in Frameworks */,
+				087B7AFF6BB5B82BEBBCCED8 /* libsqlite3.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +91,7 @@
 				962A6B7D8541EB8C4130A061 /* ServiceRowView.swift */,
 				1B887E6AC9FD1BB538A2F00B /* SettingsView.swift */,
 				17D8D5980A5EC2E160C4FEF7 /* StatusDashboardView.swift */,
+				01512CCC2B6FBC7699EFDD55 /* UptimeHistoryView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -105,6 +113,14 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		9E676BE27A2F603AAE953219 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6C40F86A12934463AC54D582 /* libsqlite3.tbd */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		D56DDA46AB42995348EACDA2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -124,6 +140,7 @@
 				76D5531912E63A1F757946CB /* StatusManager.swift */,
 				04B619B417F42A7B9E5B5AD1 /* StatusProvider.swift */,
 				4C96B7963FF9BDD1EFD4C12F /* UpdateChecker.swift */,
+				F49BF7421645136AF923BFC9 /* UptimeStore.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -132,6 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				01228B3F3D139E8F09C9691A /* Firewatch */,
+				9E676BE27A2F603AAE953219 /* Frameworks */,
 				0E3EF907E6A3A001F93B3470 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -222,6 +240,8 @@
 				09826C2E849987D49062912B /* StatusModels.swift in Sources */,
 				1F8A0205EAFA41D82E4214F3 /* StatusProvider.swift in Sources */,
 				6818995DE53C8AD6637D8F25 /* UpdateChecker.swift in Sources */,
+				B31B8014531913A3446D5F5F /* UptimeHistoryView.swift in Sources */,
+				DFE0FD5A90DFF6B307B2FCEF /* UptimeStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -242,7 +262,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.firewatch.Firewatch;
 				SDKROOT = macosx;
 			};
@@ -262,7 +282,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.firewatch.Firewatch;
 				SDKROOT = macosx;
 			};

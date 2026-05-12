@@ -10,6 +10,7 @@ final class StatusManager: ObservableObject {
     private var timer: Timer?
     private var providers: [ScriptStatusProvider] = []
     let notificationManager = NotificationManager()
+    let uptimeStore = UptimeStore()
     private var previousHealthStates: [String: ServiceHealth] = [:]
     private var lastFetchTime: Date = .distantPast
     private var isSleeping = false
@@ -137,18 +138,30 @@ final class StatusManager: ObservableObject {
         let notificationsEnabled = UserDefaults.standard.bool(forKey: "notificationsEnabled")
         if notificationsEnabled {
             for service in results {
-                if let previous = previousHealthStates[service.id],
-                   previous != service.health {
-                    await notificationManager.sendStatusChangeNotification(
-                        service: service,
-                        previousHealth: previous
-                    )
+                if let previous = previousHealthStates[service.id] {
+                    if previous != service.health {
+                        NSLog("[Firewatch] Status change detected: \(service.name) \(previous.displayName) → \(service.health.displayName)")
+                        await notificationManager.sendStatusChangeNotification(
+                            service: service,
+                            previousHealth: previous
+                        )
+                    }
+                } else {
+                    NSLog("[Firewatch] First seen: \(service.name) = \(service.health.displayName) (no previous state, skipping notification)")
                 }
             }
+        } else {
+            NSLog("[Firewatch] Notifications disabled, skipping change detection")
         }
 
         for service in results {
             previousHealthStates[service.id] = service.health
+        }
+
+        // Log status for uptime history
+        if UserDefaults.standard.bool(forKey: "uptimeLoggingEnabled") {
+            uptimeStore.logStatus(services: results)
+            NotificationCenter.default.post(name: .uptimeDataUpdated, object: nil)
         }
 
         services = results

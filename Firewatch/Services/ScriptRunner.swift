@@ -24,6 +24,7 @@ final class ScriptRunner {
 
         injectOutput(into: context)
         injectFetch(into: context)
+        injectFetchResponse(into: context)
         injectFetchText(into: context)
         injectFetchAll(into: context)
         injectStripHtml(into: context)
@@ -38,7 +39,7 @@ final class ScriptRunner {
             : nil
 
         // Break retain cycles (context -> block -> context)
-        for key in ["fetch", "fetchText", "fetchAll", "stripHtml", "log"] {
+        for key in ["fetch", "fetchResponse", "fetchText", "fetchAll", "stripHtml", "log"] {
             context.setObject(nil, forKeyedSubscript: key as NSString)
         }
 
@@ -118,6 +119,54 @@ final class ScriptRunner {
             return JSValue(object: jsonObject, in: ctx)
         }
         context.setObject(block, forKeyedSubscript: "fetch" as NSString)
+    }
+
+    // MARK: - fetchResponse(url)
+
+    private static func injectFetchResponse(into context: JSContext) {
+        let sess = session
+        let block: @convention(block) (String) -> JSValue = { urlString in
+            let ctx = JSContext.current()!
+            guard let url = URL(string: urlString) else {
+                ctx.exception = JSValue(newErrorFromMessage: "Invalid URL: \(urlString)", in: ctx)
+                return JSValue(undefinedIn: ctx)
+            }
+
+            let semaphore = DispatchSemaphore(value: 0)
+            var resultData: Data?
+            var resultResponse: URLResponse?
+            var resultError: Error?
+
+            sess.dataTask(with: url) { data, response, error in
+                resultData = data
+                resultResponse = response
+                resultError = error
+                semaphore.signal()
+            }.resume()
+
+            semaphore.wait()
+
+            if let error = resultError {
+                ctx.exception = JSValue(newErrorFromMessage: "Fetch failed: \(error.localizedDescription)", in: ctx)
+                return JSValue(undefinedIn: ctx)
+            }
+
+            let statusCode = (resultResponse as? HTTPURLResponse)?.statusCode ?? 0
+
+            var body: Any = NSNull()
+            if let data = resultData,
+               let text = String(data: data, encoding: .utf8) {
+                let cleanText = text.hasPrefix("\u{FEFF}") ? String(text.dropFirst()) : text
+                if let jsonData = cleanText.data(using: .utf8),
+                   let jsonObject = try? JSONSerialization.jsonObject(with: jsonData) {
+                    body = jsonObject
+                }
+            }
+
+            let result: [String: Any] = ["status": statusCode, "body": body]
+            return JSValue(object: result, in: ctx)
+        }
+        context.setObject(block, forKeyedSubscript: "fetchResponse" as NSString)
     }
 
     // MARK: - fetchText(url)

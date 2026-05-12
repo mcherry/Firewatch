@@ -25,7 +25,10 @@ final class NotificationManager: NSObject, Sendable, UNUserNotificationCenterDel
         let center = UNUserNotificationCenter.current()
         let settings = await center.notificationSettings()
 
-        guard settings.authorizationStatus == .authorized else { return }
+        guard settings.authorizationStatus == .authorized else {
+            NSLog("[Firewatch] Notification blocked: authorization status is \(settings.authorizationStatus.rawValue), not authorized")
+            return
+        }
 
         let content = UNMutableNotificationContent()
         content.title = "\(service.name) Status Change"
@@ -33,16 +36,18 @@ final class NotificationManager: NSObject, Sendable, UNUserNotificationCenterDel
         content.sound = .default
         content.categoryIdentifier = "STATUS_CHANGE"
 
+        let identifier = "status-\(service.id)-\(Int(Date().timeIntervalSince1970))"
         let request = UNNotificationRequest(
-            identifier: "status-\(service.id)-\(Int(Date().timeIntervalSince1970))",
+            identifier: identifier,
             content: content,
             trigger: nil
         )
 
         do {
             try await center.add(request)
+            NSLog("[Firewatch] Notification delivered: [\(identifier)] \(content.body)")
         } catch {
-            print("Failed to deliver notification: \(error)")
+            NSLog("[Firewatch] Notification FAILED: [\(identifier)] \(error)")
         }
     }
 
