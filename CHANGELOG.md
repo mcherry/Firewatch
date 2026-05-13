@@ -2,6 +2,12 @@
 
 All notable changes to Firewatch are documented here.
 
+## [1.4.1] — 2026-05-13
+
+### Changed
+- Replaced third-party KeyboardShortcuts library with a native Carbon hotkey implementation — Firewatch now has zero external dependencies
+- Custom shortcut recorder view in Settings replaces the library-provided one
+
 ## [1.4.0] — 2026-05-13
 
 ### Added

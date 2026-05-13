@@ -343,10 +343,6 @@ Status checks are JavaScript scripts executed via Apple's built-in [JavaScriptCo
 - **Fast** — scripts run in-process (~1ms context creation) rather than spawning subprocesses
 - **Portable** — works on every macOS version that supports JavaScriptCore (all of them)
 
-## Third-Party Libraries
-
-- **[KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)** by Sindre Sorhus — MIT License. Used for configurable global keyboard shortcuts.
-
 ## Image Attribution
 
 App icon: *Wildfire Watch Tower* — [StockCake](https://stockcake.com/i/wildfire-watch-tower_2538630_1477269). Free to use with attribution.

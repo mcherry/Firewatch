@@ -1,5 +1,4 @@
 import SwiftUI
-import KeyboardShortcuts
 import UserNotifications
 
 struct SettingsView: View {
@@ -106,7 +105,13 @@ struct GeneralSettingsView: View {
             }
 
             Section {
-                KeyboardShortcuts.Recorder("Toggle Status Panel:", name: .toggleStatusPanel)
+                ShortcutRecorderView(label: "Toggle Status Panel:") { newCombo in
+                    if let combo = newCombo {
+                        HotkeyManager.shared.update(combo: combo)
+                    } else {
+                        HotkeyManager.shared.clearShortcut()
+                    }
+                }
             }
 
             Section {

@@ -1,15 +1,6 @@
 import AppKit
 import SwiftUI
 import Combine
-import KeyboardShortcuts
-
-extension KeyboardShortcuts.Name {
-    static let toggleStatusPanel = Self(
-        "toggleStatusPanel",
-        default: .init(.s, modifiers: [.shift, .option])
-    )
-}
-
 // MARK: - Floating Panel
 
 final class StatusPanel: NSPanel {
@@ -221,7 +212,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     // MARK: - Keyboard Shortcut
 
     private func setupKeyboardShortcut() {
-        KeyboardShortcuts.onKeyDown(for: .toggleStatusPanel) { [weak self] in
+        let combo = HotkeyManager.shared.loadSaved() ?? .default
+        HotkeyManager.shared.register(combo: combo) { [weak self] in
             Task { @MainActor [weak self] in
                 self?.togglePanel()
             }

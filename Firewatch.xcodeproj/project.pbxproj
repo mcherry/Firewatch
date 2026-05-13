@@ -11,6 +11,7 @@
 		087B7AFF6BB5B82BEBBCCED8 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C40F86A12934463AC54D582 /* libsqlite3.tbd */; };
 		09826C2E849987D49062912B /* StatusModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1A4427C8BF3B1505A699DE /* StatusModels.swift */; };
 		0A071C2A73E9E84EF2A523B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F4EBB57E0BD422F0C1C6212 /* Assets.xcassets */; };
+		1AAAB360E506B5EDC965B0D6 /* GlobalHotkey.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2C8EEE8960287431A6DD2D /* GlobalHotkey.swift */; };
 		1F8A0205EAFA41D82E4214F3 /* StatusProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04B619B417F42A7B9E5B5AD1 /* StatusProvider.swift */; };
 		2B38E9FDA14BDDAD93EDEF46 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2A77757472D846FEED5850B /* AppDelegate.swift */; };
 		302F7AE611F1098A73C5128E /* StatusDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17D8D5980A5EC2E160C4FEF7 /* StatusDashboardView.swift */; };
@@ -19,7 +20,6 @@
 		57F53D04B7374F170C1CC600 /* StatusManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76D5531912E63A1F757946CB /* StatusManager.swift */; };
 		6818995DE53C8AD6637D8F25 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C96B7963FF9BDD1EFD4C12F /* UpdateChecker.swift */; };
 		7395527EDAD8780021EC58FE /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B887E6AC9FD1BB538A2F00B /* SettingsView.swift */; };
-		9B60E276C5087A38E6409ACE /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 265B1DEB4501BDAF1C970F76 /* KeyboardShortcuts */; };
 		B31B8014531913A3446D5F5F /* UptimeHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01512CCC2B6FBC7699EFDD55 /* UptimeHistoryView.swift */; };
 		D3DD828C3B31D9A098605EA7 /* FirewatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0F20055803BD586358D62E /* FirewatchApp.swift */; };
 		DBA9B57E3E15FFF9CCA9EF85 /* ScriptStatusProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB4E69C69F473F94CE42190 /* ScriptStatusProvider.swift */; };
@@ -48,6 +48,7 @@
 		9CB4E69C69F473F94CE42190 /* ScriptStatusProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptStatusProvider.swift; sourceTree = "<group>"; };
 		AD1A4427C8BF3B1505A699DE /* StatusModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusModels.swift; sourceTree = "<group>"; };
 		C2A77757472D846FEED5850B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DE2C8EEE8960287431A6DD2D /* GlobalHotkey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalHotkey.swift; sourceTree = "<group>"; };
 		F49BF7421645136AF923BFC9 /* UptimeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UptimeStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -56,7 +57,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B60E276C5087A38E6409ACE /* KeyboardShortcuts in Frameworks */,
 				087B7AFF6BB5B82BEBBCCED8 /* libsqlite3.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -109,6 +109,7 @@
 			children = (
 				C2A77757472D846FEED5850B /* AppDelegate.swift */,
 				2D0F20055803BD586358D62E /* FirewatchApp.swift */,
+				DE2C8EEE8960287431A6DD2D /* GlobalHotkey.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -171,7 +172,6 @@
 			);
 			name = Firewatch;
 			packageProductDependencies = (
-				265B1DEB4501BDAF1C970F76 /* KeyboardShortcuts */,
 			);
 			productName = Firewatch;
 			productReference = 8107DF589FAF86D8B071BA03 /* Firewatch.app */;
@@ -197,9 +197,6 @@
 			);
 			mainGroup = E874D17FA05CF7977CBF7316;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				1386672BC36D835FD8B56898 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
-			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0E3EF907E6A3A001F93B3470 /* Products */;
 			projectDirPath = "";
@@ -229,6 +226,7 @@
 				2B38E9FDA14BDDAD93EDEF46 /* AppDelegate.swift in Sources */,
 				E0A3DA8F53E38244007F60CC /* CheckScriptManager.swift in Sources */,
 				D3DD828C3B31D9A098605EA7 /* FirewatchApp.swift in Sources */,
+				1AAAB360E506B5EDC965B0D6 /* GlobalHotkey.swift in Sources */,
 				01B23815F9E53ECD0C007B56 /* NotificationManager.swift in Sources */,
 				4A7F7F53C58432EB47964105 /* ScriptRunner.swift in Sources */,
 				DBA9B57E3E15FFF9CCA9EF85 /* ScriptStatusProvider.swift in Sources */,
@@ -262,7 +260,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.firewatch.Firewatch;
 				SDKROOT = macosx;
 			};
@@ -282,7 +280,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.4.0;
+				MARKETING_VERSION = 1.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.firewatch.Firewatch;
 				SDKROOT = macosx;
 			};
@@ -429,25 +427,6 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		1386672BC36D835FD8B56898 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		265B1DEB4501BDAF1C970F76 /* KeyboardShortcuts */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 1386672BC36D835FD8B56898 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
-			productName = KeyboardShortcuts;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0EFE3064AF1D5939ED8ADBD7 /* Project object */;
 }
