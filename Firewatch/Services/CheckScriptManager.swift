@@ -387,14 +387,31 @@ extension CheckScriptManager {
     //   fetch(url, {encoding}) — HTTP GET with custom encoding (e.g., "utf-16")
     //   fetchText(url)         — HTTP GET, returns raw string
     //   fetchAll([urls])       — fetch multiple URLs concurrently, returns array
+    //   fetchResponse(url)     — HTTP GET, returns {status, body}
     //   output(obj)            — set the result (required, call exactly once)
     //   stripHtml(text)        — remove HTML tags and decode entities
     //   log(message)           — debug logging (visible in Console.app)
     //   statuspageCheck(url)   — one-liner for Statuspage.io services
+    //   tcpCheck(host, port)   — TCP connect check, returns {success, latencyMs, error}
+    //   tcpCheck(host, port, {timeout}) — with custom timeout in seconds (default: 5)
     //
     // Status values: "operational", "degraded", "partial_outage", "major_outage", "unknown"
 
-    // Simple example: check if a URL responds successfully
+    // --- Example: Statuspage.io one-liner ---
+    // statuspageCheck("https://status.example.com/api/v2/summary.json");
+
+    // --- Example: Simple HTTP health check ---
+    // try {
+    //     fetch("https://example.com/api/health");
+    //     output({ status: "operational" });
+    // } catch (e) {
+    //     output({ status: "major_outage" });
+    // }
+
+    // --- Example: TCP port check ---
+    // var result = tcpCheck("db.example.com", 5432);
+    // output({ status: result.success ? "operational" : "major_outage" });
+
     try {
         fetch("https://example.com/api/health");
         output({ status: "operational" });

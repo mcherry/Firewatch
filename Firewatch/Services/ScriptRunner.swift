@@ -1,9 +1,11 @@
 import Foundation
 import JavaScriptCore
+import Network
 
 /// Runs a JavaScript status check script in a sandboxed JSContext.
-/// Injects helper functions (fetch, fetchAll, fetchText, output, stripHtml, log, statuspageCheck)
-/// and returns the result dictionary produced by calling output().
+/// Injects helper functions (fetch, fetchAll, fetchText, output, stripHtml, log,
+/// statuspageCheck, ping, tcpCheck) and returns the result dictionary produced
+/// by calling output().
 final class ScriptRunner {
 
     private static let session: URLSession = {
@@ -30,6 +32,7 @@ final class ScriptRunner {
         injectStripHtml(into: context)
         injectLog(into: context)
         injectStatuspageCheck(into: context)
+        injectTcpCheck(into: context)
 
         context.evaluateScript(script)
 
@@ -39,7 +42,7 @@ final class ScriptRunner {
             : nil
 
         // Break retain cycles (context -> block -> context)
-        for key in ["fetch", "fetchResponse", "fetchText", "fetchAll", "stripHtml", "log"] {
+        for key in ["fetch", "fetchResponse", "fetchText", "fetchAll", "stripHtml", "log", "tcpCheck"] {
             context.setObject(nil, forKeyedSubscript: key as NSString)
         }
 
@@ -310,5 +313,76 @@ final class ScriptRunner {
             });
         }
         """#)
+    }
+
+    // MARK: - tcpCheck(host, port, options?)
+
+    private static func injectTcpCheck(into context: JSContext) {
+        let block: @convention(block) (String, Int, JSValue) -> JSValue = { host, port, optionsValue in
+            let ctx = JSContext.current()!
+
+            var timeout: TimeInterval = 5
+            if !optionsValue.isUndefined && !optionsValue.isNull,
+               let opts = optionsValue.toDictionary(),
+               let t = opts["timeout"] as? NSNumber {
+                timeout = t.doubleValue
+            }
+
+            let result = tcpConnect(host: host, port: UInt16(port), timeout: timeout)
+            return JSValue(object: result, in: ctx)
+        }
+        context.setObject(block, forKeyedSubscript: "tcpCheck" as NSString)
+    }
+
+    // MARK: - TCP Connect Implementation
+
+    private static func tcpConnect(host: String, port: UInt16, timeout: TimeInterval) -> [String: Any] {
+        guard let nwPort = NWEndpoint.Port(rawValue: port) else {
+            return ["success": false, "latencyMs": NSNull(), "error": "Invalid port: \(port)"]
+        }
+
+        let connection = NWConnection(
+            host: NWEndpoint.Host(host),
+            port: nwPort,
+            using: .tcp
+        )
+
+        let semaphore = DispatchSemaphore(value: 0)
+        var success = false
+        var errorMsg: String?
+        let startTime = CFAbsoluteTimeGetCurrent()
+
+        connection.stateUpdateHandler = { state in
+            switch state {
+            case .ready:
+                success = true
+                semaphore.signal()
+            case .failed(let error):
+                errorMsg = error.localizedDescription
+                semaphore.signal()
+            case .waiting(let error):
+                errorMsg = "Waiting: \(error.localizedDescription)"
+                semaphore.signal()
+            default:
+                break
+            }
+        }
+
+        let queue = DispatchQueue(label: "com.firewatch.tcpcheck")
+        connection.start(queue: queue)
+
+        let result = semaphore.wait(timeout: .now() + timeout)
+        let latency = (CFAbsoluteTimeGetCurrent() - startTime) * 1000.0
+        connection.cancel()
+
+        if result == .timedOut {
+            return ["success": false, "latencyMs": NSNull(), "error": "Connection timed out after \(timeout)s"]
+        }
+
+        if success {
+            return ["success": true, "latencyMs": round(latency * 100) / 100, "error": NSNull()]
+        } else {
+            return ["success": false, "latencyMs": NSNull(), "error": errorMsg ?? "Connection failed"]
+        }
     }
 }

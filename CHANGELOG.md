@@ -2,6 +2,15 @@
 
 All notable changes to Firewatch are documented here.
 
+## [1.4.0] — 2026-05-13
+
+### Added
+- **TCP port check** — new `tcpCheck(host, port, options?)` function available in check scripts. Connects to an arbitrary TCP port and returns `{success, latencyMs, error}` with configurable timeout. Useful for monitoring databases, mail servers, and other non-HTTP services.
+- TCP port check example added to `TEMPLATE.js.example`
+
+### Fixed
+- Status icons are now consistent across the dashboard — all health states use circle-family SF Symbols instead of mixing triangles and circles
+
 ## [1.3.1] — 2026-05-12
 
 ### Fixed

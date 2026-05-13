@@ -28,7 +28,7 @@ enum ServiceHealth: String, Codable, Sendable, CaseIterable {
     var iconName: String {
         switch self {
         case .operational: "checkmark.circle.fill"
-        case .degradedPerformance: "exclamationmark.triangle.fill"
+        case .degradedPerformance: "minus.circle.fill"
         case .partialOutage: "exclamationmark.circle.fill"
         case .majorOutage: "xmark.circle.fill"
         case .unknown: "questionmark.circle.fill"

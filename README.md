@@ -122,6 +122,8 @@ Scripts are sorted alphabetically by filename. Use numeric prefixes to control o
 | `log(message)` | Debug logging (visible in Console.app) |
 | `statuspageCheck(url)` | One-liner for any Statuspage.io service |
 | `statuspageCheck(url, {showcaseFilter: false})` | Same, but includes all components |
+| `tcpCheck(host, port)` | TCP connect check → `{ success, latencyMs, error }` |
+| `tcpCheck(host, port, {timeout: 5})` | Same, with custom timeout in seconds |
 
 ### Status Values
 
@@ -291,6 +293,37 @@ output({
     components: components,
     incidents: mappedIncidents
 });
+```
+
+### Example: TCP Port Check
+
+Test if a service is reachable by connecting to its TCP port. Useful for databases, mail servers, or any non-HTTP service:
+
+```javascript
+// FIREWATCH_NAME = "Database Cluster"
+// FIREWATCH_URL = ""
+
+var primary = tcpCheck("db-primary.example.com", 5432, { timeout: 3 });
+var replica = tcpCheck("db-replica.example.com", 5432, { timeout: 3 });
+
+var components = [
+    {
+        name: "Primary (db-primary:5432)",
+        status: primary.success ? "operational" : "major_outage",
+        description: primary.success ? "Latency: " + primary.latencyMs + "ms" : primary.error
+    },
+    {
+        name: "Replica (db-replica:5432)",
+        status: replica.success ? "operational" : "major_outage",
+        description: replica.success ? "Latency: " + replica.latencyMs + "ms" : replica.error
+    }
+];
+
+var status = "operational";
+if (!primary.success) status = "major_outage";
+else if (!replica.success) status = "partial_outage";
+
+output({ status: status, components: components });
 ```
 
 ### Tips
