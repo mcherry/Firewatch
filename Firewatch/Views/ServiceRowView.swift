@@ -33,6 +33,13 @@ struct ServiceRowView: View {
 
             Spacer()
 
+            // Response time
+            if let ms = service.responseTimeMs {
+                Text(formatResponseTime(ms))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
             // Status indicator
             Image(systemName: service.health.iconName)
                 .foregroundStyle(service.health.color)
@@ -114,6 +121,14 @@ struct ServiceRowView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
+        }
+    }
+
+    private func formatResponseTime(_ ms: Double) -> String {
+        if ms < 1000 {
+            return "\(Int(ms)) ms"
+        } else {
+            return String(format: "%.1fs", ms / 1000)
         }
     }
 }

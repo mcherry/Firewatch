@@ -313,7 +313,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
             return
         }
 
-        let historyView = UptimeHistoryView(uptimeStore: statusManager.uptimeStore)
+        let historyView = UptimeHistoryView(uptimeStore: statusManager.uptimeStore, statusManager: statusManager)
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 800, height: 500),

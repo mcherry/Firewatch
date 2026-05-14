@@ -377,6 +377,10 @@ extension CheckScriptManager {
     // FIREWATCH_NAME = "My Service"
     // FIREWATCH_URL = "https://example.com/status"
     //
+    // Optional: set a custom polling interval for this script (in seconds, minimum 30).
+    // If omitted, the global refresh interval from Settings is used.
+    // FIREWATCH_INTERVAL = "60"
+    //
     // Firewatch Status Check Template
     // ================================
     // Copy this file, rename to NN-myservice.js, and restart Firewatch
@@ -396,6 +400,17 @@ extension CheckScriptManager {
     //   tcpCheck(host, port, {timeout}) — with custom timeout in seconds (default: 5)
     //
     // Status values: "operational", "degraded", "partial_outage", "major_outage", "unknown"
+    //
+    // Response time tracking:
+    //   Firewatch automatically measures script execution time. To report a more
+    //   precise value (e.g., just the HTTP/TCP portion), include responseTimeMs in
+    //   your output:
+    //     output({ status: "operational", responseTimeMs: 142 })
+    //
+    //   For tcpCheck, pass through the latencyMs:
+    //     var result = tcpCheck("db.example.com", 5432);
+    //     output({ status: result.success ? "operational" : "major_outage",
+    //              responseTimeMs: result.latencyMs });
 
     // --- Example: Statuspage.io one-liner ---
     // statuspageCheck("https://status.example.com/api/v2/summary.json");
@@ -408,9 +423,10 @@ extension CheckScriptManager {
     //     output({ status: "major_outage" });
     // }
 
-    // --- Example: TCP port check ---
+    // --- Example: TCP port check with response time ---
     // var result = tcpCheck("db.example.com", 5432);
-    // output({ status: result.success ? "operational" : "major_outage" });
+    // output({ status: result.success ? "operational" : "major_outage",
+    //          responseTimeMs: result.latencyMs });
 
     try {
         fetch("https://example.com/api/health");

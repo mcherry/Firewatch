@@ -17,7 +17,7 @@ final class ScriptRunner {
         return URLSession(configuration: config)
     }()
 
-    static func run(script: String) -> [String: Any]? {
+    static func run(script: String) -> (result: [String: Any]?, elapsedMs: Double) {
         let context = JSContext()!
 
         context.exceptionHandler = { _, exception in
@@ -34,7 +34,9 @@ final class ScriptRunner {
         injectStatuspageCheck(into: context)
         injectTcpCheck(into: context)
 
+        let startTime = CFAbsoluteTimeGetCurrent()
         context.evaluateScript(script)
+        let elapsedMs = (CFAbsoluteTimeGetCurrent() - startTime) * 1000.0
 
         let result = context.objectForKeyedSubscript("__firewatch_result")
         let dict = result?.isUndefined == false && result?.isNull == false
@@ -46,7 +48,7 @@ final class ScriptRunner {
             context.setObject(nil, forKeyedSubscript: key as NSString)
         }
 
-        return dict
+        return (dict, round(elapsedMs * 100) / 100)
     }
 
     // MARK: - output() and log()

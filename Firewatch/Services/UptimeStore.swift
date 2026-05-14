@@ -38,7 +38,7 @@ final class UptimeStore: @unchecked Sendable {
     func logStatus(services: [ServiceInfo]) {
         queue.sync {
             let now = Date().timeIntervalSince1970
-            let sql = "INSERT INTO status_log (timestamp, serviceId, serviceName, health) VALUES (?, ?, ?, ?)"
+            let sql = "INSERT INTO status_log (timestamp, serviceId, serviceName, health, response_time_ms) VALUES (?, ?, ?, ?, ?)"
 
             guard let stmt = prepareStatement(sql) else { return }
             defer { sqlite3_finalize(stmt) }
@@ -50,6 +50,11 @@ final class UptimeStore: @unchecked Sendable {
                 bindText(stmt, index: 2, value: service.id)
                 bindText(stmt, index: 3, value: service.name)
                 sqlite3_bind_int(stmt, 4, Int32(service.health.severity))
+                if let rt = service.responseTimeMs {
+                    sqlite3_bind_double(stmt, 5, rt)
+                } else {
+                    sqlite3_bind_null(stmt, 5)
+                }
 
                 if sqlite3_step(stmt) != SQLITE_DONE {
                     NSLog("[Firewatch] Failed to insert status log: \(errorMessage)")
@@ -68,7 +73,7 @@ final class UptimeStore: @unchecked Sendable {
             let sql: String
             if let serviceId {
                 sql = """
-                    SELECT id, timestamp, serviceId, serviceName, health
+                    SELECT id, timestamp, serviceId, serviceName, health, response_time_ms
                     FROM status_log
                     WHERE serviceId = ? AND timestamp >= ? AND timestamp <= ?
                     ORDER BY timestamp ASC
@@ -81,7 +86,7 @@ final class UptimeStore: @unchecked Sendable {
                 entries = readEntries(stmt)
             } else {
                 sql = """
-                    SELECT id, timestamp, serviceId, serviceName, health
+                    SELECT id, timestamp, serviceId, serviceName, health, response_time_ms
                     FROM status_log
                     WHERE timestamp >= ? AND timestamp <= ?
                     ORDER BY timestamp ASC
@@ -147,6 +152,35 @@ final class UptimeStore: @unchecked Sendable {
         }
     }
 
+    /// Returns min/avg/max response time for a service in a time range.
+    func fetchResponseTimeStats(serviceId: String, from: Date, to: Date) -> (min: Double, avg: Double, max: Double)? {
+        queue.sync {
+            let fromTs = from.timeIntervalSince1970
+            let toTs = to.timeIntervalSince1970
+            let sql = """
+                SELECT MIN(response_time_ms), AVG(response_time_ms), MAX(response_time_ms)
+                FROM status_log
+                WHERE serviceId = ? AND timestamp >= ? AND timestamp <= ?
+                    AND response_time_ms IS NOT NULL
+                """
+            guard let stmt = prepareStatement(sql) else { return nil }
+            defer { sqlite3_finalize(stmt) }
+            bindText(stmt, index: 1, value: serviceId)
+            sqlite3_bind_double(stmt, 2, fromTs)
+            sqlite3_bind_double(stmt, 3, toTs)
+
+            if sqlite3_step(stmt) == SQLITE_ROW {
+                // All three are NULL if no rows match
+                guard sqlite3_column_type(stmt, 0) != SQLITE_NULL else { return nil }
+                let minVal = sqlite3_column_double(stmt, 0)
+                let avgVal = sqlite3_column_double(stmt, 1)
+                let maxVal = sqlite3_column_double(stmt, 2)
+                return (min: minVal, avg: avgVal, max: maxVal)
+            }
+            return nil
+        }
+    }
+
     // MARK: - Schema
 
     private func createSchema() {
@@ -160,6 +194,12 @@ final class UptimeStore: @unchecked Sendable {
             )
             """)
         execute("CREATE INDEX IF NOT EXISTS idx_status_log_service_time ON status_log (serviceId, timestamp)")
+        migrateSchema()
+    }
+
+    private func migrateSchema() {
+        // v1.5.0: add response time column
+        execute("ALTER TABLE status_log ADD COLUMN response_time_ms REAL")
     }
 
     // MARK: - SQLite Helpers
@@ -210,12 +250,15 @@ final class UptimeStore: @unchecked Sendable {
     private func readEntries(_ stmt: OpaquePointer) -> [StatusLogEntry] {
         var entries: [StatusLogEntry] = []
         while sqlite3_step(stmt) == SQLITE_ROW {
+            let rt: Double? = sqlite3_column_type(stmt, 5) != SQLITE_NULL
+                ? sqlite3_column_double(stmt, 5) : nil
             let entry = StatusLogEntry(
                 id: sqlite3_column_int64(stmt, 0),
                 timestamp: Date(timeIntervalSince1970: sqlite3_column_double(stmt, 1)),
                 serviceId: columnText(stmt, index: 2),
                 serviceName: columnText(stmt, index: 3),
-                health: Int(sqlite3_column_int(stmt, 4))
+                health: Int(sqlite3_column_int(stmt, 4)),
+                responseTimeMs: rt
             )
             entries.append(entry)
         }

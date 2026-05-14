@@ -13,6 +13,7 @@ final class StatusManager: ObservableObject {
     let uptimeStore = UptimeStore()
     private var previousHealthStates: [String: ServiceHealth] = [:]
     private var lastFetchTime: Date = .distantPast
+    private var lastPollTimes: [String: Date] = [:]
     private var isSleeping = false
     private var sleepObserver: NSObjectProtocol?
     private var wakeObserver: NSObjectProtocol?
@@ -29,8 +30,8 @@ final class StatusManager: ObservableObject {
     }
 
     /// Returns the currently loaded scripts for display in Settings.
-    var loadedScripts: [(name: String, filename: String)] {
-        providers.map { ($0.serviceName, $0.scriptPath.lastPathComponent) }
+    var loadedScripts: [(name: String, filename: String, interval: TimeInterval?)] {
+        providers.map { ($0.serviceName, $0.scriptPath.lastPathComponent, $0.customInterval) }
     }
 
     init() {
@@ -89,7 +90,7 @@ final class StatusManager: ObservableObject {
             .map { ScriptStatusProvider(scriptPath: $1, sortOrder: $0) }
     }
 
-    /// Fetches status from all providers. Enforces minimum interval between fetches.
+    /// Fetches status from all providers (or only due providers on timer ticks).
     func refreshAll(force: Bool = false) async {
         guard !isSleeping else { return }
 
@@ -103,10 +104,27 @@ final class StatusManager: ObservableObject {
 
         isRefreshing = true
         lastFetchTime = now
-        var results: [ServiceInfo] = []
+
+        // Determine which providers to run
+        let dueProviders: [ScriptStatusProvider]
+        if force {
+            dueProviders = providers
+        } else {
+            dueProviders = providers.filter { provider in
+                let interval = provider.customInterval ?? refreshInterval
+                let lastPoll = lastPollTimes[provider.serviceName] ?? .distantPast
+                return now.timeIntervalSince(lastPoll) >= interval
+            }
+        }
+
+        // Keep existing results for providers we're not refreshing
+        var resultsByID: [String: ServiceInfo] = [:]
+        for s in services { resultsByID[s.id] = s }
+
+        var freshResults: [ServiceInfo] = []
 
         await withTaskGroup(of: ServiceInfo?.self) { group in
-            for provider in providers {
+            for provider in dueProviders {
                 group.addTask {
                     do {
                         return try await provider.fetchStatus()
@@ -120,7 +138,8 @@ final class StatusManager: ObservableObject {
                             incidents: [],
                             lastUpdated: Date(),
                             statusPageURL: "",
-                            sortOrder: provider.sortOrder
+                            sortOrder: provider.sortOrder,
+                            responseTimeMs: nil
                         )
                     }
                 }
@@ -128,16 +147,34 @@ final class StatusManager: ObservableObject {
 
             for await result in group {
                 if let info = result {
-                    results.append(info)
+                    freshResults.append(info)
                 }
             }
         }
 
+        // Update poll times for providers that ran
+        for provider in dueProviders {
+            lastPollTimes[provider.serviceName] = now
+        }
+
+        // Merge fresh results into existing
+        for result in freshResults {
+            resultsByID[result.id] = result
+        }
+
+        // Build sorted results from all known providers
+        var results: [ServiceInfo] = []
+        for provider in providers {
+            let id = provider.serviceName.lowercased().replacingOccurrences(of: " ", with: "-")
+            if let info = resultsByID[id] {
+                results.append(info)
+            }
+        }
         results.sort { $0.sortOrder < $1.sortOrder }
 
         let notificationsEnabled = UserDefaults.standard.bool(forKey: "notificationsEnabled")
         if notificationsEnabled {
-            for service in results {
+            for service in freshResults {
                 if let previous = previousHealthStates[service.id] {
                     if previous != service.health {
                         NSLog("[Firewatch] Status change detected: \(service.name) \(previous.displayName) → \(service.health.displayName)")
@@ -154,7 +191,7 @@ final class StatusManager: ObservableObject {
             NSLog("[Firewatch] Notifications disabled, skipping change detection")
         }
 
-        for service in results {
+        for service in freshResults {
             previousHealthStates[service.id] = service.health
         }
 
@@ -171,7 +208,10 @@ final class StatusManager: ObservableObject {
 
     func startTimer() {
         timer?.invalidate()
-        let interval = refreshInterval + Double.random(in: 0...30)
+        // Use the shortest interval across all providers (or global if none custom)
+        let minInterval = providers.compactMap { $0.customInterval }.min() ?? refreshInterval
+        let effectiveInterval = min(minInterval, refreshInterval)
+        let interval = effectiveInterval + Double.random(in: 0...30)
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor [weak self] in
                 await self?.refreshAll()

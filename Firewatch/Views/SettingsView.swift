@@ -29,7 +29,7 @@ struct SettingsView: View {
 
 struct ScriptsSettingsView: View {
     @ObservedObject var statusManager: StatusManager
-    @State private var scripts: [(name: String, filename: String)] = []
+    @State private var scripts: [(name: String, filename: String, interval: TimeInterval?)] = []
 
     var body: some View {
         Form {
@@ -44,6 +44,11 @@ struct ScriptsSettingsView: View {
                         HStack {
                             Text(script.name)
                             Spacer()
+                            if let interval = script.interval {
+                                Text(formatInterval(interval))
+                                    .foregroundStyle(.blue)
+                                    .font(.caption)
+                            }
                             Text(script.filename)
                                 .foregroundStyle(.secondary)
                                 .font(.caption)
@@ -79,6 +84,12 @@ struct ScriptsSettingsView: View {
 
     private func loadScripts() {
         scripts = statusManager.loadedScripts
+    }
+
+    private func formatInterval(_ seconds: TimeInterval) -> String {
+        if seconds < 60 { return "\(Int(seconds))s" }
+        if seconds < 3600 { return "\(Int(seconds / 60))m" }
+        return "\(Int(seconds / 3600))h"
     }
 }
 

@@ -12,9 +12,11 @@ A macOS menu bar app that monitors the health of key infrastructure services at 
 - **Status dashboard** — floating panel shows all monitored services with component-level detail
 - **Service drill-down** — click any service to see components, active incidents, and recent event history
 - **Global keyboard shortcut** — configurable hotkey to toggle the dashboard (default: ⇧⌥S)
-- **Background polling** — refreshes service status on a configurable interval (default: 2 minutes)
+- **Background polling** — refreshes service status on a configurable interval (default: 2 minutes), with optional per-script intervals
 - **macOS notifications** — opt-in alerts when a service degrades, integrated with the native notification system
-- **Uptime history** — opt-in logging of service health at each poll interval, with a graphical timeline showing historical uptime per service
+- **Response time tracking** — measures and displays service response time in the dashboard and uptime history charts
+- **Uptime history** — opt-in logging of service health and response time at each poll interval, with a graphical timeline showing historical uptime per service
+- **Uptime report export** — export uptime data as CSV or PDF from the history window
 - **Custom status checks** — write JavaScript scripts to monitor any service, using a built-in API
 - **Dark mode support** — adapts to system appearance
 
@@ -102,11 +104,19 @@ On first launch, Firewatch copies the default check scripts into this directory.
 
 Each `.js` file in the checks directory is a status check. The app:
 
-1. **Reads metadata** from comment headers (`FIREWATCH_NAME`, `FIREWATCH_URL`) without executing the script
+1. **Reads metadata** from comment headers (`FIREWATCH_NAME`, `FIREWATCH_URL`, `FIREWATCH_INTERVAL`) without executing the script
 2. **Runs the script** in a sandboxed JavaScript context with injected helper functions
 3. **Parses the output** from the `output()` call and displays it in the dashboard
 
 Scripts are sorted alphabetically by filename. Use numeric prefixes to control order (e.g., `01-github.js`, `02-aws.js`).
+
+### Script Metadata
+
+| Comment Directive | Required | Description |
+|-------------------|----------|-------------|
+| `// FIREWATCH_NAME = "My Service"` | No | Display name (defaults to filename without extension) |
+| `// FIREWATCH_URL = "https://..."` | No | Status page URL for the service |
+| `// FIREWATCH_INTERVAL = "60"` | No | Custom polling interval in seconds (minimum 30). Overrides the global refresh interval for this script only. |
 
 ### Available Functions
 
@@ -144,6 +154,7 @@ Only `status` is required. Everything else is optional:
 ```json
 {
   "status": "operational",
+  "responseTimeMs": 142,
   "components": [
     { "name": "API", "status": "operational", "description": "Optional detail" }
   ],
@@ -323,7 +334,7 @@ var status = "operational";
 if (!primary.success) status = "major_outage";
 else if (!replica.success) status = "partial_outage";
 
-output({ status: status, components: components });
+output({ status: status, components: components, responseTimeMs: primary.latencyMs });
 ```
 
 ### Tips

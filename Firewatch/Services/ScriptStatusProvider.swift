@@ -4,6 +4,7 @@ struct ScriptStatusProvider: StatusProvider {
     let scriptPath: URL
     let serviceName: String
     let sortOrder: Int
+    let customInterval: TimeInterval?
 
     private let scriptContent: String
     private let pageURL: String
@@ -15,6 +16,13 @@ struct ScriptStatusProvider: StatusProvider {
         self.serviceName = Self.parseMetadata("FIREWATCH_NAME", from: scriptContent)
             ?? scriptPath.deletingPathExtension().lastPathComponent
         self.pageURL = Self.parseMetadata("FIREWATCH_URL", from: scriptContent) ?? ""
+
+        if let intervalStr = Self.parseMetadata("FIREWATCH_INTERVAL", from: scriptContent),
+           let interval = Double(intervalStr), interval >= 30 {
+            self.customInterval = interval
+        } else {
+            self.customInterval = nil
+        }
     }
 
     func fetchStatus() async throws -> ServiceInfo {
@@ -23,8 +31,8 @@ struct ScriptStatusProvider: StatusProvider {
 
         return try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.global(qos: .utility).async {
-                let result = ScriptRunner.run(script: content)
-                continuation.resume(returning: self.mapResult(result))
+                let (result, elapsedMs) = ScriptRunner.run(script: content)
+                continuation.resume(returning: self.mapResult(result, measuredTimeMs: elapsedMs))
             }
         }
     }
@@ -42,10 +50,13 @@ struct ScriptStatusProvider: StatusProvider {
 
     // MARK: - Result Mapping
 
-    private func mapResult(_ result: [String: Any]?) -> ServiceInfo {
+    private func mapResult(_ result: [String: Any]?, measuredTimeMs: Double) -> ServiceInfo {
         guard let result else { return makeUnknownInfo() }
 
         let health = mapStatus(result["status"] as? String)
+
+        // Use script-reported response time if available, otherwise fall back to measured execution time
+        let responseTimeMs: Double? = (result["responseTimeMs"] as? NSNumber)?.doubleValue ?? measuredTimeMs
 
         let components: [ServiceComponent] = (result["components"] as? [[String: Any]] ?? []).map { comp in
             ServiceComponent(
@@ -98,7 +109,8 @@ struct ScriptStatusProvider: StatusProvider {
             incidents: incidents,
             lastUpdated: Date(),
             statusPageURL: pageURL,
-            sortOrder: sortOrder
+            sortOrder: sortOrder,
+            responseTimeMs: responseTimeMs
         )
     }
 
@@ -121,7 +133,8 @@ struct ScriptStatusProvider: StatusProvider {
             incidents: [],
             lastUpdated: Date(),
             statusPageURL: pageURL,
-            sortOrder: sortOrder
+            sortOrder: sortOrder,
+            responseTimeMs: nil
         )
     }
 }

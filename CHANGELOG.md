@@ -2,6 +2,16 @@
 
 All notable changes to Firewatch are documented here.
 
+## [1.5.0] — 2026-05-14
+
+### Added
+- **Response time tracking** — Firewatch now measures script execution time and displays it as a latency badge on each service row in the dashboard. Scripts can self-report a precise value via `output({ responseTimeMs: ... })`. Response time is logged to the uptime database and shown as a line chart in the Uptime History window with min/avg/max stats.
+- **Per-script polling intervals** — scripts can define a custom polling interval via `// FIREWATCH_INTERVAL = "60"` metadata comment (minimum 30 seconds). Scripts without a custom interval use the global setting from Settings. Custom intervals are displayed in the Scripts settings tab.
+- **Uptime report export** — export uptime data from the Uptime History window as CSV or PDF. CSV includes timestamp, service, health status, and response time. PDF generates a formatted report with per-service summaries, uptime percentages, response time stats, and sampled data tables.
+
+### Fixed
+- Removed check scripts no longer appear in the Uptime History graph — only active services are shown
+
 ## [1.4.2] — 2026-05-14
 
 ### Added

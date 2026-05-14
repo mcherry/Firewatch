@@ -75,6 +75,7 @@ struct ServiceInfo: Identifiable, Sendable {
     let lastUpdated: Date
     let statusPageURL: String
     let sortOrder: Int
+    let responseTimeMs: Double?
 }
 
 struct ServiceComponent: Identifiable, Sendable {
@@ -144,6 +145,7 @@ struct StatusLogEntry: Identifiable {
     let serviceId: String
     let serviceName: String
     let health: Int  // ServiceHealth.severity value
+    let responseTimeMs: Double?
     
     var serviceHealth: ServiceHealth {
         switch health {
