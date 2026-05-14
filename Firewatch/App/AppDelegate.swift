@@ -23,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     private var globalClickMonitor: Any?
     private var localClickMonitor: Any?
     private var lastToggleTime: TimeInterval = 0
+    private var previousApp: NSRunningApplication?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UserDefaults.standard.register(defaults: [
@@ -60,12 +61,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     }
 
     @objc private func handleOpenSettings() {
-        hidePanel()
+        hidePanel(restoreFocus: false)
         openSettings()
     }
 
     @objc private func handleOpenUptimeHistory() {
-        hidePanel()
+        hidePanel(restoreFocus: false)
         openUptimeHistory()
     }
 
@@ -154,9 +155,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
         panel.contentView?.layer?.masksToBounds = true
     }
 
-    private func hidePanel() {
+    private func hidePanel(restoreFocus: Bool = true) {
         panel.orderOut(nil)
         NotificationCenter.default.post(name: .panelDidClose, object: nil)
+
+        if restoreFocus, let app = previousApp, !app.isTerminated {
+            app.activate()
+        }
+        previousApp = nil
     }
 
     func togglePanel() {
@@ -172,6 +178,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
     }
 
     private func showPanel() {
+        previousApp = NSWorkspace.shared.frontmostApplication
         updatePanelSize()
         positionPanelBelowStatusItem()
         panel.orderFrontRegardless()

@@ -2,6 +2,11 @@
 
 All notable changes to Firewatch are documented here.
 
+## [1.4.2] — 2026-05-14
+
+### Added
+- **Focus restoration** — when the dashboard panel is dismissed, focus returns to the window that was active before the panel was opened
+
 ## [1.4.1] — 2026-05-13
 
 ### Changed
