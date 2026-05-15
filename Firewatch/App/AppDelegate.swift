@@ -243,6 +243,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, ObservableObject {
                     return
                 }
 
+                // Don't dismiss if clicking inside the panel itself
+                if self.panel.isVisible && self.panel.frame.contains(clickPoint) {
+                    return
+                }
+
                 // Don't dismiss if we just showed the panel (local monitor may have
                 // already handled this same click)
                 let now = ProcessInfo.processInfo.systemUptime

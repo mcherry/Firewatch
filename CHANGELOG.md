@@ -2,6 +2,11 @@
 
 All notable changes to Firewatch are documented here.
 
+## [1.5.1] — 2026-05-15
+
+### Fixed
+- **Dashboard disappears when clicking a service** — the global click-outside-to-dismiss monitor did not check whether the click landed inside the panel itself. When macOS deactivated the menu-bar app between showing the panel and clicking a service row, the click fired through the global monitor and dismissed the dashboard. Added a panel frame bounds check so clicks inside the panel are never treated as outside dismissals. Regression introduced alongside the focus restoration feature in 1.4.2.
+
 ## [1.5.0] — 2026-05-14
 
 ### Added
